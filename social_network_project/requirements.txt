@@ -1,0 +1,10 @@
+Django==3.2.9
+djangorestframework==3.12.4
+djangorestframework-simplejwt==4.8.0
+psycopg2-binary==2.9.9
+django-filter==21.1
+drf_yasg==1.21.7
+dj-database-url
+django-redis
+redis
+setuptools>=58.0.0
