@@ -29,19 +29,62 @@ User = get_user_model()
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 class SignUpView(generics.CreateAPIView):
+    """
+    API view to handle user registration.
+
+    Allows any user (authenticated or not) to create a new account by providing the necessary information.
+
+    - **Method**: POST
+    - **Permissions**: AllowAny (accessible to everyone)
+    - **Body Parameters**:
+        - name: name for the user.
+        - password: Password for the user.
+        - email: Email address for the user.
+    """
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = SignUpSerializer
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    API view to obtain a custom token pair (access and refresh tokens).
+
+    This endpoint is used to authenticate users and return JWT tokens for further requests.
+
+    - **Method**: POST
+    - **Body Parameters**:
+        - email: The user's username.
+        - password: The user's password.
+    - **Response**: 
+        - access: Access token.
+        - refresh: Refresh token.
+    """
     serializer_class = CustomTokenObtainPairSerializer
 
 class CustomPageNumberPagination(PageNumberPagination):
+    """
+    Custom pagination class to handle pagination in API responses.
+
+    - Default page size: 10
+    - Query Parameter `page_size`: Allows the user to control the number of results per page.
+    - Maximum page size: 100
+    """
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
 class UserSearchView(generics.ListAPIView):
+    """
+    API view to search for users based on a query string.
+
+    Allows authenticated users to search for other users by name or email. It supports both exact matches and partial matches.
+
+    - **Method**: GET
+    - **Permissions**: IsAuthenticated
+    - **Query Parameters**:
+        - q: The search query (can be a name or email).
+    - **Pagination**: Custom pagination is applied to limit results.
+    """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPageNumberPagination
@@ -74,6 +117,19 @@ class UserSearchView(generics.ListAPIView):
 
 
 class SendFriendRequestView(generics.CreateAPIView):
+    """
+    API view to send a friend request to another user.
+
+    Allows authenticated users to send a friend request to another user. It also enforces various validations like preventing duplicate requests, checking if users are blocked, and ensuring a cooldown period.
+
+    - **Method**: POST
+    - **Permissions**: IsAuthenticated
+    - **Body Parameters**:
+        - receiver: The user who will receive the friend request.
+    - **Validations**:
+        - Prevents sending requests if blocked.
+        - Prevents duplicate or excessive friend requests within a cooldown period.
+    """
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -124,6 +180,18 @@ class SendFriendRequestView(generics.CreateAPIView):
 
 
 class AcceptRejectFriendRequestView(generics.UpdateAPIView):
+    """
+    API view to accept or reject a friend request.
+
+    Allows the receiver of a friend request to accept or reject it. Also creates a friendship if the request is accepted.
+
+    - **Method**: PUT
+    - **Permissions**: IsAuthenticated
+    - **Body Parameters**:
+        - status: The new status of the friend request ('ACCEPTED' or 'REJECTED').
+    - **Validations**:
+        - Only the receiver of the request can modify its status.
+    """
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -182,6 +250,14 @@ class AcceptRejectFriendRequestView(generics.UpdateAPIView):
 
 
 class FriendsListView(generics.ListAPIView):
+    """
+    API view to list all friends of the logged-in user.
+
+    Retrieves a cached list of friends if available, otherwise queries the database and caches the result.
+
+    - **Method**: GET
+    - **Permissions**: IsAuthenticated
+    """
     serializer_class = FriendshipSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -202,6 +278,12 @@ class FriendsListView(generics.ListAPIView):
         # return Friendship.objects.filter(user=self.request.user)
 
 class PendingFriendRequestsView(generics.ListAPIView):
+    """
+    API view to list all pending friend requests for the logged-in user.
+
+    - **Method**: GET
+    - **Permissions**: IsAuthenticated
+    """
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -209,6 +291,16 @@ class PendingFriendRequestsView(generics.ListAPIView):
         return FriendRequest.objects.filter(receiver=self.request.user, status='PENDING')
 
 class BlockUnblockUserView(APIView):
+    """
+    API view to block or unblock a user.
+
+    Allows authenticated users to block or unblock another user. Blocked users cannot send friend requests or become friends with the blocking user.
+
+    - **Method**: POST (for blocking), DELETE (for unblocking)
+    - **Permissions**: IsAuthenticated
+    - **Path Parameters**:
+        - user_id: The ID of the user to block or unblock.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
@@ -253,6 +345,12 @@ class BlockUnblockUserView(APIView):
             return Response({"detail": "User is not blocked."}, status=status.HTTP_400_BAD_REQUEST)
         
 class UserActivityView(generics.ListAPIView):
+    """
+    API view to list the recent activities of the logged-in user.
+
+    - **Method**: GET
+    - **Permissions**: IsAuthenticated
+    """
     serializer_class = UserActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
 
