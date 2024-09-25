@@ -54,11 +54,11 @@ This is a social networking API built using Django and Django REST Framework. It
 1. **The Django Application will be accessible at http://localhost:8000**.
 2. Use Postman or any API client to interact with the endpoints. 
     Postman collections:
-    [a link](https://api.postman.com/collections/14846803-01efcb02-70c6-4f56-aebb-b8b43d9c2751?access_key=PMAT-01J8MRAWCSYCPTHGZAJ5PQEHHY)
+    [Postman collections](https://api.postman.com/collections/14846803-01efcb02-70c6-4f56-aebb-b8b43d9c2751?access_key=PMAT-01J8MRAWCSYCPTHGZAJ5PQEHHY)
 3. To see available endpoints, access the Django admin panel at http://localhost:8000/admin/. or API Documentation (Swagger): http://127.0.0.1:8000/swagger/.
 
 ## API Documentation
-- API documentation(Swagger) is available at [a link](http://127.0.0.1:8000/swagger/).
+- API documentation(Swagger) is available at [Swagger API documents](http://127.0.0.1:8000/swagger/).
 
 ### API Endpoints
 1. User Login/SignUp:
